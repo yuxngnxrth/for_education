@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>PayloadContent</key>
+  <array>
+    <dict>
+      <key>PayloadCertificateFileName</key><string>ca.crt</string>
+      <key>PayloadContent</key><data>MIIDoTCCAomgAwIBAgIUeIDGhb9m73gOvq6FF2pWjYKrqVMwDQYJKoZIhvcNAQELBQAwYDELMAkGA1UEBhMCUlUxDzANBgNVBAgMBk1vc2NvdzETMBEGA1UEBwwKWmVsZW5vZ3JhZDENMAsGA1UECgwETUlFVDEMMAoGA1UECwwDVENTMQ4wDAYDVQQDDAVNeS1DQTAeFw0yNjA1MTcxNjUyMDFaFw0zNjA1MTQxNjUyMDFaMGAxCzAJBgNVBAYTAlJVMQ8wDQYDVQQIDAZNb3Njb3cxEzARBgNVBAcMClplbGVub2dyYWQxDTALBgNVBAoMBE1JRVQxDDAKBgNVBAsMA1RDUzEOMAwGA1UEAwwFTXktQ0EwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCze4h+1xv2AGVs9rxXyAx4ClojRkAD9gU1KiuakU8tHAWctXcu9SkFL8T9nS8iFrlKMv2oqt2JwNovRUjpMb0eoHhTOKcR16/UTe8x62+sfz6X8lOA5p6MTE/QSHS88+v6CKM5EbGiL3Gu94JRmkS8sQwcn3VqvxjIPGP474xmw2S6nAMTz3E217/wC286PBhe7MYlOw3+gl8gLFgpAmkpDoU9lOsJcDH/xNXG1mZSxRWNzCm7fedIuL/+vm6/jZKibVP9geADdvyRRSrFwkn7Ps45fbF5hDWF1yxeeFyqpkj8Ye4I3dHFf96xdgCke6xj6UL3BGH/dyUnhmqmSjeJAgMBAAGjUzBRMB0GA1UdDgQWBBRznAbmqwNRS+TrIN6v03mtuEfMMTAfBgNVHSMEGDAWgBRznAbmqwNRS+TrIN6v03mtuEfMMTAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQCpfNWe27MnrN/kJoymVoYfhBl+xPC7YY29YVg7DZMOiPXBVTXqlqW0FexXRROF49GX4x+ypZp1yqYpBwcj5MLKF+WCGsDRiBXgkJm9GnAGVHuuu7y+qVDjkgQVPbUUYlnkajE0z+9L/G2V4PLrS6YIUZkl5qRt3Ud2+gmHz8+bzKfS4b4KdWQIGBgVVQJVMMlj1QcWbHKnCs48Pa5lWeK54AUvsfR1ps2uBH7bYE0AgDsMjOlhIyYnNZ8GpV2GGgwU6GTPp8T4FRont0Vf+1V0KOieREwHpUab8C+tS+v5YxP0FgYZuD+i2qJYzYbHugZ0dkoTyYUkzQy8xJxg+pRM</data>
+      <key>PayloadDisplayName</key><string>Asterisk Root CA</string>
+      <key>PayloadIdentifier</key><string>com.asterisk.ca</string>
+      <key>PayloadType</key><string>com.apple.security.root</string>
+      <key>PayloadUUID</key><string>11111111-1111-1111-1111-111111111111</string>
+      <key>PayloadVersion</key><integer>1</integer>
+    </dict>
+  </array>
+  <key>PayloadDisplayName</key><string>Asterisk VoIP CA</string>
+  <key>PayloadIdentifier</key><string>com.asterisk.profile</string>
+  <key>PayloadType</key><string>Configuration</string>
+  <key>PayloadUUID</key><string>22222222-2222-2222-2222-222222222222</string>
+  <key>PayloadVersion</key><integer>1</integer>
+</dict>
+</plist>

@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  wombat:
+    image: loway/wombatdialer:latest
+    container_name: wombat
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=Europe/Moscow
+      - WOMBAT_DB_URL=jdbc:h2:/data/wombat;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      - WOMBAT_DB_USER=sa
+      - WOMBAT_DB_PASS=
+    volumes:
+      - wombat-data:/data
+      - wombat-logs:/usr/local/tomcat/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/wombat"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  wombat-data:
+    driver: local
+  wombat-logs:
+    driver: local

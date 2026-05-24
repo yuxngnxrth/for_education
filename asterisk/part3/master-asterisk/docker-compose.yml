@@ -1,0 +1,22 @@
+services:
+  asterisk:
+    image: master-asterisk:1.0
+    container_name: master-asterisk
+    privileged: true
+    network_mode: host
+    restart: unless-stopped
+    #volumes:
+    #   - ./cdr-logs:/var/log/asterisk/cdr-csv
+    #  # Опционально: можно монтировать конфиги для live-редактирования
+    #  - ./extensions.conf:/etc/asterisk/extensions.conf
+    #  - ./pjsip.conf:/etc/asterisk/pjsip.conf
+    #  - ./sounds:/var/lib/asterisk/sounds
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536

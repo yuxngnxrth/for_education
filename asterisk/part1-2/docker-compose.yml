@@ -1,0 +1,17 @@
+services:
+  asterisk:
+    image: my-asterisk:1.0
+    container_name: asterisk18
+    privileged: true
+    network_mode: host
+    restart: unless-stopped
+    #volumes:
+    #  # Опционально: можно монтировать конфиги для live-редактирования
+    #  - ./extensions.conf:/etc/asterisk/extensions.conf
+    #  - ./pjsip.conf:/etc/asterisk/pjsip.conf
+    #  - ./sounds:/var/lib/asterisk/sounds
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

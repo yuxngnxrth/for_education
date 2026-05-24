@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns="http://www.linphone.org/xsd/lpc">
+  <section name="sip">
+    <entry name="verify_server_certs" overwrite="true">0</entry>
+    <entry name="verify_server_cn" overwrite="true">0</entry>
+  </section>
+</config>

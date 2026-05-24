@@ -1,0 +1,21 @@
+name: asterisk_db
+
+services:
+  mysql:
+    image: mysql:5.7
+    container_name: asterisk-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: asterisk_user
+      MYSQL_PASSWORD: asterisk_pass
+    #ports:
+    #  - "3306:3306"
+    network_mode: host
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    restart: unless-stopped
+
+volumes:
+  mysql_data:

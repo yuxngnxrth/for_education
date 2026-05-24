@@ -1,0 +1,117 @@
+name: asterisk_secure
+
+# Раздел 4: защищённое окружение Asterisk
+# Все сервисы работают в host-режиме (аналогично part3), что позволяет:
+#  - Asterisk: RTP/SIP на хостовых портах без NAT
+#  - MySQL: доступен по 127.0.0.1:3306
+#  - phpMyAdmin: внутренний Apache на 127.0.0.1:8082
+#  - Nginx: публичный HTTPS на :80 и :443, проксирует на localhost:8082
+#  - fail2ban: имеет доступ к хостовым iptables через CAP_NET_ADMIN
+
+services:
+
+  # ── MySQL ──────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:5.7
+    container_name: asterisk-mysql-secure
+    network_mode: host
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_USER: asterisk_user
+      MYSQL_PASSWORD: asterisk_pass
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── Asterisk (TLS/SRTP) ───────────────────────────────────────────────────
+  asterisk:
+    build:
+      context: ./asterisk
+    image: asterisk-secure:1.0
+    container_name: asterisk-secure
+    network_mode: host
+    privileged: true
+    volumes:
+      - asterisk_keys:/etc/asterisk/keys      # сертификаты генерируются при старте
+      - asterisk_logs:/var/log/asterisk       # логи для fail2ban
+    depends_on:
+      - mysql
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  # ── phpMyAdmin (внутренний, порт 8082) ────────────────────────────────────
+  phpmyadmin:
+    build:
+      context: ./phpmyadmin
+    image: phpmyadmin-secure:1.0
+    container_name: phpmyadmin-secure
+    network_mode: host
+    environment:
+      PMA_HOST: 127.0.0.1
+      PMA_PORT: "3306"
+      PMA_USER: asterisk_user
+      PMA_PASSWORD: asterisk_pass
+      APACHE_PORT: "8082"
+    depends_on:
+      - mysql
+    restart: unless-stopped
+
+  # ── Nginx (HTTPS + HTTP Basic Auth) ──────────────────────────────────────
+  nginx:
+    build:
+      context: ./nginx
+    image: nginx-secure:1.0
+    container_name: nginx-secure
+    network_mode: host
+    volumes:
+      - nginx_certs:/etc/nginx/ssl            # TLS-сертификаты, создаются при старте
+      - nginx_logs:/var/log/nginx             # логи для fail2ban
+    depends_on:
+      - phpmyadmin
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ── fail2ban ──────────────────────────────────────────────────────────────
+  fail2ban:
+    build:
+      context: ./fail2ban
+    image: fail2ban-secure:1.0
+    container_name: fail2ban-secure
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - asterisk_logs:/var/log/asterisk:ro
+      - nginx_logs:/var/log/nginx:ro
+      - /var/log:/var/log/host:ro             # логи хоста (auth.log, syslog)
+      - /var/log/journal:/var/log/journal:ro  # systemd journal для backend=systemd (SSH jail)
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+  asterisk_keys:
+  asterisk_logs:
+  nginx_certs:
+  nginx_logs:

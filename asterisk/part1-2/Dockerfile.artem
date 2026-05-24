@@ -1,0 +1,119 @@
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV ASTERISK_VERSION=18
+
+# -----------------------------
+# 1. Установка зависимостей (как в методичке)
+# -----------------------------
+RUN apt-get update && apt-get install -y \
+    wget \
+    git \
+    gcc \
+    g++ \
+    make \
+    subversion \
+    cmake \
+    automake \
+    autoconf \
+    pkg-config \
+    graphviz \
+    curl \
+    libnewt-dev \
+    libssl-dev \
+    libncurses5-dev \
+    libsqlite3-dev \
+    build-essential \
+    libjansson-dev \
+    libxml2-dev \
+    uuid-dev \
+    libedit-dev \
+    libsrtp2-dev \
+    unixodbc \
+    unixodbc-dev \
+    sox \
+    ca-certificates \
+    nano \
+    && rm -rf /var/lib/apt/lists/*
+
+# -----------------------------
+# 2. Скачивание Asterisk (wget, как в методичке)
+# -----------------------------
+WORKDIR /usr/src
+
+RUN wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz 
+
+RUN tar xf asterisk-18-current.tar.gz \
+    && mv asterisk-18.* asterisk-18
+
+WORKDIR /usr/src/asterisk-18
+
+# -----------------------------
+# 3. MP3 (get_mp3_source.sh — ОБЯЗАТЕЛЬНО)
+# -----------------------------
+
+# -----------------------------
+# 4. Очистка и configure
+# -----------------------------
+RUN make distclean || true
+RUN ./configure
+
+# -----------------------------
+# 5. menuselect (ТОЧНО ПО МЕТОДИЧКЕ, НО БЕЗ GUI)
+# -----------------------------
+RUN make menuselect.makeopts && \
+    menuselect/menuselect \
+        --disable format_mp3 \
+        --enable codec_opus \
+        --disable cdr_radius \
+        --disable cdr_tds \
+        --disable cel_radius \
+        --disable cel_tds \
+        --disable res_ari \
+        --disable res_ari_applications \
+        --disable res_ari_channels \
+        --disable res_ari_events \
+        --disable res_ari_model \
+        --disable res_fax \
+        --disable res_phoneprov \
+        --disable res_smdi \
+        --enable chan_pjsip \
+        --enable chan_iax2 \
+        menuselect.makeopts
+
+# -----------------------------
+# 6. Сборка и установка
+# -----------------------------
+RUN make -j$(nproc)
+RUN make install
+RUN make samples
+RUN make config
+RUN ldconfig
+
+# -----------------------------
+# 7. Пользователь asterisk (как в методичке)
+# -----------------------------
+RUN groupadd asterisk && \
+    useradd -r -d /var/lib/asterisk -g asterisk asterisk && \
+    usermod -aG audio,dialout asterisk && \
+    chown -R asterisk:asterisk /etc/asterisk /var/lib/asterisk /var/log/asterisk /usr/lib/asterisk
+
+# -----------------------------
+# 8. Базовые настройки asterisk.conf
+# -----------------------------
+RUN sed -i 's/^;runuser/runuser/' /etc/asterisk/asterisk.conf && \
+    sed -i 's/^;rungroup/rungroup/' /etc/asterisk/asterisk.conf && \
+    sed -i 's/^;defaultlanguage = en/defaultlanguage = ru/' /etc/asterisk/asterisk.conf
+
+# -----------------------------
+# 9. Порты SIP + RTP
+# -----------------------------
+EXPOSE 5060/udp
+EXPOSE 10000-20000/udp
+
+# -----------------------------
+# 10. Запуск
+# -----------------------------
+USER asterisk
+CMD ["asterisk", "-fvvv"]
+
